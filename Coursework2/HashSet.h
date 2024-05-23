@@ -73,4 +73,14 @@ public:
         }
         return array;
     }
+    T* findByEmail(const std::string& email) {
+        for (int i = 0; i < size; ++i) {
+            for (int j = 0; j < table[i].count(); ++j) {
+                if (table[i].elementAt(j).email == email) {
+                    return &table[i].elementAtRef(j);
+                }
+            }
+        }
+        return nullptr;
+    }
 };

@@ -37,6 +37,24 @@ struct Student {
         }
         return total;
     }
+    // Методы для редактирования данных студента
+    void setFIO(string& newFIO) {
+        FIO = newFIO;
+    }
+    void setNumber(int newNumber) {
+        number = newNumber;
+    }
+    void setGrades(int newGrades[5]) {
+        for (int i = 0; i < 5; i++) {
+            grades[i] = newGrades[i];
+        }
+    }
+    void setScholarship(int newScholarship) {
+        scholarship = newScholarship;
+    }
+    void setEmail(string& newEmail) {
+        email = newEmail;
+    }
 
 };
 
@@ -53,9 +71,9 @@ public:
         students.add(student);
     }
 
-    // Удаление студента из группы по ФИО
-    void removeStudent(std::string& FIO) {
-        students.remove(FIO);
+    // Удаление студента из группы по email
+    void removeStudent(std::string& email) {
+        students.remove(email);
     }
 
     // Получение общей суммы стипендии всех студентов группы
@@ -82,6 +100,94 @@ public:
     int getGroupNumber() {
         return groupNumber;
     }
+
+    Student* findStudent(const string& email) {
+        return students.findByEmail(email);
+    }
+    // Обновление информации о студенте
+    bool updateStudentFIO(string& email, string& newFIO) {
+        Student* student = findStudent(email);
+        if (student) {
+            student->setFIO(newFIO);
+            return true;
+        }
+        return false;
+    }
+
+    bool updateStudentNumber(string& email, int newNumber) {
+        Student* student = findStudent(email);
+        if (student) {
+            student->setNumber(newNumber);
+            return true;
+        }
+        return false;
+    }
+
+    bool updateStudentGrades(string& email, int newGrades[5]) {
+        Student* student = findStudent(email);
+        if (student) {
+            student->setGrades(newGrades);
+            return true;
+        }
+        return false;
+    }
+
+    bool updateStudentScholarship(string& email, int newScholarship) {
+        Student* student = findStudent(email);
+        if (student) {
+            student->setScholarship(newScholarship);
+            return true;
+        }
+        return false;
+    }
+
+    bool updateStudentEmail(string& email, string& newEmail) {
+        Student* student = findStudent(email);
+        if (student) {
+            student->setEmail(newEmail);
+            return true;
+        }
+        return false;
+    }
+
+    // Фильтрация студентов по заданному значению
+    void filterStudents(int field, const string& value, int intValue = 0) {
+        Student* studentArray = students.ToArray();
+        for (int i = 0; i < students.count(); i++) {
+            bool match = false;
+            switch (field) {
+            case 1:
+                if (studentArray[i].FIO == value) match = true;
+                break;
+            case 2:
+                if (studentArray[i].email == value) match = true;
+                break;
+            case 3:
+                for (int j = 0; j < 5; j++) {
+                    if (studentArray[i].grades[j] == intValue) match = true;
+                }
+                break;
+            case 4:
+                if (studentArray[i].scholarship == intValue) match = true;
+                break;
+            case 5:
+                if (studentArray[i].number == intValue) match = true;
+                break;
+            }
+            if (match) {
+                cout << "ФИО: " << studentArray[i].FIO << ", Номер группы: " << studentArray[i].number
+                    << ", Стипендия: " << studentArray[i].scholarship << ", Email: " << studentArray[i].email << endl;
+                cout << "Оценки: ";
+                for (int j = 0; j < 5; j++) {
+                    cout << studentArray[i].grades[j] << " ";
+                }
+                cout << endl;
+            }
+        }
+        delete[] studentArray;
+    }
+
+
 
     // Вывод в консоль информации о всех студентах группы
     void printStudents() {
@@ -181,13 +287,72 @@ public:
             groupTree.add(groupNumber, newGroup);
         }
     }
-    // Удаляет студента из группы по ФИО
-    void removeStudentFromGroup(int groupNumber, string& FIO) {
+    // Удаляет студента из группы по email
+    void removeStudentFromGroup(int groupNumber, string& email) {
         Group* group = findGroup(groupNumber);
         if (group) {
-            group->removeStudent(FIO);
+            group->removeStudent(email);
         }
     }
+
+
+    // Редактирование данных студента в группе
+    bool editStudentFIOInGroup(int groupNumber, string& email, string& newFIO) {
+        Group* group = findGroup(groupNumber);
+        if (group) {
+            return group->updateStudentFIO(email, newFIO);
+        }
+        return false;
+    }
+
+    bool editStudentNumberInGroup(int currentGroupNumber, string& email, int newGroupNumber) {
+        Group* currentGroup = findGroup(currentGroupNumber);
+        Group* newGroup = findGroup(newGroupNumber);
+        if (currentGroup && newGroup) {
+            Student* student = currentGroup->findStudent(email);
+            if (student) {
+                newGroup->addStudent(*student);
+                currentGroup->removeStudent(email);
+                delete student;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    bool editStudentGradesInGroup(int groupNumber, string& email, int newGrades[5]) {
+        Group* group = findGroup(groupNumber);
+        if (group) {
+            return group->updateStudentGrades(email, newGrades);
+        }
+        return false;
+    }
+
+    bool editStudentScholarshipInGroup(int groupNumber, string& email, int newScholarship) {
+        Group* group = findGroup(groupNumber);
+        if (group) {
+            return group->updateStudentScholarship(email, newScholarship);
+        }
+        return false;
+    }
+
+    bool editStudentEmailInGroup(int groupNumber, string& email, string& newEmail) {
+        Group* group = findGroup(groupNumber);
+        if (group) {
+            return group->updateStudentEmail(email, newEmail);
+        }
+        return false;
+    }
+    // Фильтрация студентов по заданному значению
+    void filterStudents(int field, const string& value, int intValue = 0) {
+        int* groupsArray = groupTree.ToArray(Tree<Group*>::Infix);
+        for (int i = 0; i < groupTree.count(); i++) {
+            Group* group = findGroup(groupsArray[i]);
+            group->filterStudents(field, value, intValue);
+        }
+        delete[] groupsArray;
+    }
+
     // Получение списка номеров групп с соотношением стипендия/баллы выше заданного значения
     List<int> getGroupsWithScholarshipRatioAbove(double ratio) {
         List<int> result;
@@ -215,7 +380,7 @@ public:
         delete[] groupsArray;
     }
     // Сохранение информации о всех группах и студентах в файл
-    void saveToFile(const string& filename) {
+    void saveToFile(string& filename) {
         ofstream file(filename);
         if (file.is_open()) {
             int* groupsArray = groupTree.ToArray(Tree<Group*>::Infix);
@@ -229,7 +394,7 @@ public:
         }
     }
     // Получение информации о всех группах и студентах из файла
-    void loadFromFile(const string& filename) {
+    void loadFromFile(string& filename) {
         ifstream file(filename);
         if (file.is_open()) {
             string line;
@@ -256,7 +421,9 @@ void printMenu() {
     cout << "6. Показать группы с соотношением стипендия/баллы выше заданного\n";
     cout << "7. Сохранить данные в файл\n";
     cout << "8. Загрузить данные из файла\n";
-    cout << "9. Выход\n";
+    cout << "9. Редактировать данные студента\n";
+    cout << "10. Фильтровать студентов\n";
+    cout << "11. Выход\n";
 }
 
 int main()
@@ -268,7 +435,7 @@ int main()
         printMenu();
         cin >> choice;
 
-        if (choice == 9) {
+        if (choice == 11) {
             break;
         }
 
@@ -346,6 +513,121 @@ int main()
             cout << "Введите имя файла: ";
             cin >> filename;
             flow.loadFromFile(filename);
+            break;
+        }
+        case 9: {
+            int groupNumber;
+            string email;
+            cout << "Введите номер группы: ";
+            cin >> groupNumber;
+            cout << "Введите email студента: ";
+            cin.ignore();
+            getline(cin, email);
+            int editChoice;
+            cout << "Что вы хотите изменить?\n";
+            cout << "1. ФИО\n";
+            cout << "2. Номер группы\n";
+            cout << "3. Оценки\n";
+            cout << "4. Стипендию\n";
+            cout << "5. Email\n";
+            cin >> editChoice;
+
+            switch (editChoice) {
+            case 1: {
+                string newFIO;
+                cout << "Введите новые ФИО: ";
+                cin.ignore();
+                getline(cin, newFIO);
+                if (flow.editStudentFIOInGroup(groupNumber, email, newFIO)) {
+                    cout << "ФИО успешно обновлено.\n";
+                }
+                else {
+                    cout << "Студент не найден.\n";
+                }
+                break;
+            }
+            case 2: {
+                int newNumber;
+                cout << "Введите новый номер группы: ";
+                cin >> newNumber;
+                if (flow.editStudentNumberInGroup(groupNumber, email, newNumber)) {
+                    cout << "Номер группы успешно обновлен и студент перемещен.\n";
+                }
+                else {
+                    cout << "Студент не найден.\n";
+                }
+                break;
+            }
+            case 3: {
+                int newGrades[5];
+                cout << "Введите новые оценки (5 штук): ";
+                for (int i = 0; i < 5; i++) {
+                    cin >> newGrades[i];
+                }
+                if (flow.editStudentGradesInGroup(groupNumber, email, newGrades)) {
+                    cout << "Оценки успешно обновлены.\n";
+                }
+                else {
+                    cout << "Студент не найден.\n";
+                }
+                break;
+            }
+            case 4: {
+                int newScholarship;
+                cout << "Введите новую стипендию: ";
+                cin >> newScholarship;
+                if (flow.editStudentScholarshipInGroup(groupNumber, email, newScholarship)) {
+                    cout << "Стипендия успешно обновлена.\n";
+                }
+                else {
+                    cout << "Студент не найден.\n";
+                }
+                break;
+            }
+            case 5: {
+                string newEmail;
+                cout << "Введите новый email: ";
+                cin.ignore();
+                getline(cin, newEmail);
+                if (flow.editStudentEmailInGroup(groupNumber, email, newEmail)) {
+                    cout << "Email успешно обновлен.\n";
+                }
+                else {
+                    cout << "Студент не найден.\n";
+                }
+                break;
+            }
+            default:
+                cout << "Неверный выбор.\n";
+            }
+            break;
+        }
+        case 10: {
+            int field;
+            cout << "Выберите поле для фильтрации:\n";
+            cout << "1. ФИО\n";
+            cout << "2. Email\n";
+            cout << "3. Оценка\n";
+            cout << "4. Стипендия\n";
+            cout << "5. Номер группы\n";
+            cin >> field;
+
+            if (field == 1 || field == 2) {
+                string value;
+                cout << "Введите значение: ";
+                cin.ignore();
+                getline(cin, value);
+                flow.filterStudents(field, value);
+            }
+            else if (field == 3 || field == 4 || field == 5) {
+                int intValue;
+                cout << "Введите значение: ";
+                cin >> intValue;
+                flow.filterStudents(field,"", intValue);
+            }
+            else {
+                cout << "Неверный выбор.\n";
+            }
             break;
         }
         default:

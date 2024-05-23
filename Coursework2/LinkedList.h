@@ -153,6 +153,16 @@ public:
         }
         return getIndex(index)->data;
     }
+    T& elementAtRef(int index) {
+        if (index < 0 || index >= size) {
+            throw std::out_of_range("Index is out of range");
+        }
+        // Если запрашиваемый индекс совпадает с последним обращенным, сразу возвращаем его данные
+        if (lastAccessedIndex == index && lastAccessedNode != nullptr) {
+            return lastAccessedNode->data;
+        }
+        return getIndex(index)->data;
+    }
     int count() {
         return size;
     }
