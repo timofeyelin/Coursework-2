@@ -21,8 +21,8 @@ public:
     ~HashSet() { clear(); }
 
     void add(T& value) {
-        int index = hashFunction(value.FIO);
-        if (!contains(value.FIO)) {
+        int index = hashFunction(value.email);
+        if (!contains(value.email)) {
             table[index].add(value);
         }
     }
@@ -30,7 +30,7 @@ public:
     void remove(std::string& key) {
         int index = hashFunction(key);
         for (int i = 0; i < table[index].count(); i++) {
-            if (table[index].elementAt(i).FIO == key) {
+            if (table[index].elementAt(i).email == key) {
                 table[index].removeAt(i);
                 return;
             }
@@ -40,7 +40,7 @@ public:
     bool contains(std::string& key) {
         int index = hashFunction(key);
         for (int i = 0; i < table[index].count(); i++) {
-            if (table[index].elementAt(i).FIO == key) {
+            if (table[index].elementAt(i).email == key) {
                 return true;
             }
         }

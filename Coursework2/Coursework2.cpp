@@ -478,13 +478,13 @@ int main()
         }
         case 4: {
             int groupNumber;
-            string FIO;
+            string email;
             cout << "Введите номер группы: ";
             cin >> groupNumber;
-            cout << "Введите ФИО студента: ";
+            cout << "Введите email студента: ";
             cin.ignore();
-            getline(cin, FIO);
-            flow.removeStudentFromGroup(groupNumber, FIO);
+            getline(cin, email);
+            flow.removeStudentFromGroup(groupNumber, email);
             break;
         }
         case 5: {
