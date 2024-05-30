@@ -148,7 +148,15 @@ public:
         Student* student = findStudent(email);
         
         if (student) {
-            student->setEmail(newEmail);
+            Student tempStudent = *student;
+            tempStudent.setEmail(newEmail);
+
+            // Удаляем студента с текущим email из хеш-таблицы
+            students.remove(email);
+
+            // Добавляем студента обратно в хеш-таблицу с новым email
+            students.add(tempStudent);
+            
             return true;
         }
         
@@ -314,14 +322,17 @@ public:
     bool editStudentNumberInGroup(int currentGroupNumber, string& email, int newGroupNumber) {
         Group* currentGroup = findGroup(currentGroupNumber);
         Group* newGroup = findGroup(newGroupNumber);
+       
         if (currentGroup && newGroup) {
+            if (newGroup->findStudent(email)) {
+                return false; // В новой группе уже есть студент с таким email
+            }
             Student* student = currentGroup->findStudent(email);
             if (student) {
                 newGroup->addStudent(*student);
                 newGroup->updateStudentNumber(email, newGroupNumber);
                 currentGroup->removeStudent(email);
-                
-                
+               
                 return true;
             }
         }
@@ -562,7 +573,7 @@ int main()
                     cout << "Номер группы успешно обновлен и студент перемещен.\n";
                 }
                 else {
-                    cout << "Студент или группа не найдены.\n";
+                    cout << "Студент/группа не найдены или данный email уже существует в новой группе.\n";
                 }
                 break;
             }
