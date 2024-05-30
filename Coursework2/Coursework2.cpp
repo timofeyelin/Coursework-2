@@ -142,11 +142,17 @@ public:
     }
 
     bool updateStudentEmail(string& email, string& newEmail) {
+        if (students.contains(newEmail)) {
+            return false; // Новый email уже используется другим студентом
+        }
         Student* student = findStudent(email);
+        
         if (student) {
             student->setEmail(newEmail);
             return true;
         }
+        
+
         return false;
     }
 
@@ -312,8 +318,10 @@ public:
             Student* student = currentGroup->findStudent(email);
             if (student) {
                 newGroup->addStudent(*student);
+                newGroup->updateStudentNumber(email, newGroupNumber);
                 currentGroup->removeStudent(email);
-                delete student;
+                
+                
                 return true;
             }
         }
@@ -554,7 +562,7 @@ int main()
                     cout << "Номер группы успешно обновлен и студент перемещен.\n";
                 }
                 else {
-                    cout << "Студент не найден.\n";
+                    cout << "Студент или группа не найдены.\n";
                 }
                 break;
             }
@@ -593,7 +601,7 @@ int main()
                     cout << "Email успешно обновлен.\n";
                 }
                 else {
-                    cout << "Студент не найден.\n";
+                    cout << "Студент не найден или данный email уже занят.\n";
                 }
                 break;
             }
